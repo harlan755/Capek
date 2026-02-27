@@ -4,8 +4,6 @@
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local StatsService = game:GetService("Stats")
-local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Tunggu pemain lokal dimuat
 local player = Players.LocalPlayer
@@ -62,7 +60,9 @@ local function getPlayerData()
     local pingValue = StatsService.Network:FindFirstChild("ServerStatsItem") and StatsService.Network.ServerStatsItem["Data Ping"]:GetValue()
     data.ping = pingValue and math.floor(pingValue) or "Tidak dapat diukur"
     
-    data.playerStatus = player:IsOnline() and "Online" or "Offline"
+    -- Ganti status dengan yang valid: jika pemain ada di dalam game berarti aktif
+    data.playerStatus = "Aktif di dalam game"
+    
     data.gems = getPlayerGems()
     
     -- Waktu eksekusi WIB
@@ -88,6 +88,7 @@ local function sendToWebhook()
 - <:stable_ping:1408556059496546384> `Player Ping : %sms`
 - <:gems:1465657925770154086> `Jumlah Gems : %s`
 - <:treegt:1174568853091659827> `User ID : %s`
+- <a:online:1234567890> `Status Pemain : %s`
 - <:Bot:1283696244165836812> `Waktu Pembaruan (WIB) : %s`
 ]], 
 playerData.playerName,
@@ -95,6 +96,7 @@ playerData.displayName,
 playerData.ping,
 playerData.gems,
 playerData.userId,
+playerData.playerStatus,
 playerData.executeTime
 )
     
@@ -122,6 +124,6 @@ sendToWebhook()
 
 -- Atur pengulangan setiap 20 detik
 while true do
-    task.wait(20) -- Tunggu 20 detik sebelum mengirim lagi
+    task.wait(20)
     sendToWebhook()
 end
